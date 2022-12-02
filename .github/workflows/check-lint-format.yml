@@ -1,0 +1,24 @@
+name: CI - Check Formatting
+
+on:
+  push:
+
+jobs:
+  lint:
+    name: "Check Formatting"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Lint
+        run: poetry run task lint

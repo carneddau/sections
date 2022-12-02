@@ -1,0 +1,112 @@
+[tool.poetry]
+name = "sections"
+
+# See: https://github.com/python-poetry/poetry/pull/2366#issuecomment-652418094
+# For info on poetry versioning for Python < 3.8
+version = "0.1.0"
+
+description = "Tool to convert river section data to a more usable format"
+authors = ["Robin Kennedy-Reid <rlkennedyreid@carneddau.cymru>"]
+packages = [
+    { include = "sections", from = "src" },
+]
+
+[tool.poetry.scripts]
+sections = "sections.__main__:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = {extras = ["dotenv"], version = "^1.10.2"}
+typer = {extras = ["all"], version = "^0.7.0"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+pylint = "^2.15.7"
+mypy = "^0.991"
+black = "^22.10.0"
+flake8 = "^6.0.0"
+isort = "^5.10.1"
+taskipy = "^1.10.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[tool.mypy]
+files = ["src", "tests"]
+
+# [[tool.mypy.overrides]]
+# module = [
+#   "module_to_ignore.*",
+# ]
+# ignore_missing_imports = true
+
+[tool.black]
+# extend_exclude = '''
+# ^/exclude_dir/
+# '''
+
+# See: https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html
+# For info on compatibility of black with isort, pylint, flake8
+[tool.isort]
+profile = "black"
+src_paths = ["src", "tests"]
+# extend_skip_glob = ["exclude_dir/**"]
+
+[tool.pylint.'MESSAGES CONTROL']
+disable=[
+  "all",
+]
+
+enable=[
+  "E",
+  "F",
+]
+
+[tool.pylint.FORMAT]
+max-line-length = "88"
+output-format="colorized"
+score="no"
+
+[tool.pylint.REPORTS]
+output-format="colorized"
+score="no"
+
+[tool.pylint.MASTER]
+# https://github.com/pydantic/pydantic/issues/1961
+extension-pkg-whitelist="pydantic"
+
+# See links below on exluding directories from pyright (and thus pylance)
+# https://github.com/microsoft/pylance-release/issues/642#issuecomment-732175189
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md#sample-config-file
+[tool.pyright]
+include = ["src"]
+# exclude = ["exclude_dir/"]
+
+[tool.taskipy.tasks.lint]
+cmd = "task lint_black && task lint_isort && task lint_flake8 && task lint_pylint && task lint_mypy"
+help = "runs all lint checks"
+
+[tool.taskipy.tasks.format]
+cmd = "task format_black && task format_isort"
+help = "Runs all formatting tasks"
+
+[tool.taskipy.tasks.test]
+cmd = "pytest"
+help = "Runs tests"
+
+[tool.taskipy.tasks]
+lint_black = { cmd = "black --check ."}
+lint_isort = { cmd = "isort --check ."}
+lint_flake8 = { cmd = "flake8"}
+lint_pylint = { cmd = "pylint src tests"}
+lint_mypy = { cmd = "mypy"}
+format_black = { cmd = "black ."}
+format_isort = { cmd = "isort ."}
+post_format = { cmd = "task lint"}
+pre_test = { cmd = "task format" }

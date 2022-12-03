@@ -3,8 +3,6 @@ from typing import Optional, Tuple
 
 from pydantic import BaseModel
 
-from .utils import console
-
 
 @dataclass
 class BedManning:

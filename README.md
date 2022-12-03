@@ -18,3 +18,6 @@ To install dev and prod dependencies as well as the root package, run
 ```shell
 poetry install
 ```
+## Usage
+
+[![asciicast](https://asciinema.org/a/542377.svg)](https://asciinema.org/a/542377)

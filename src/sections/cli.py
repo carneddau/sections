@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from typer import Option, Typer
+from typer import Exit, Option, Typer
 
 from .input import (
     generate_rivers,
@@ -8,16 +8,29 @@ from .input import (
     read_short_rivername_mapping,
 )
 from .schema import Section
-from .utils import console, uopen
+from .settings import get_settings
+from .utils import console, create_basic_logger, err_console, package, uopen
 
 # Allow invocation without subcommand so --version option does not produce an error
 interface = Typer()
 
 
 @interface.command()
-def main(
-    data: Path = Option(default=..., readable=True),
-    river_names: Path = Option(default=..., readable=True),
+def _main(
+    data: Path = Option(
+        default=...,
+        exists=True,
+        readable=True,
+        resolve_path=True,
+        dir_okay=False,
+    ),
+    river_names: Path = Option(
+        default=...,
+        exists=True,
+        readable=True,
+        resolve_path=True,
+        dir_okay=False,
+    ),
 ):
     sections = read_and_process_sections(data)
     mapping = read_short_rivername_mapping(river_names)
@@ -48,6 +61,16 @@ def write_rivers_to_csv(mapping: dict[int, str], rivers: dict[int, list[Section]
                     file.write(f"{record}\n")
 
 
-def cli():
-    """Run the CLI tool"""
-    interface()
+def main():
+    """
+    Set the log level for the top-level package. This log level will propogate to all child modules.
+
+    Using this method avoids creating the root logger, which will cause third party libs
+    to spam the log output.
+    """
+    create_basic_logger(package(), get_settings().log_level)
+    try:
+        interface()
+    except Exception as err:
+        err_console.print(err)
+        Exit(1)

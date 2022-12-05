@@ -1,0 +1,107 @@
+name: CLI - Build and Publish Binaries
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  PACKAGE_NAME: sections
+jobs:
+  build-binaries:
+    defaults:
+      run:
+        shell: bash
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          cache: "poetry"
+
+      - name: Install root project and packaging dependencies
+        run: poetry install --no-interaction
+
+      - name: Package binary
+        run: poetry run python package.py
+
+      - name: Check binary
+        run: dist/main.exe --help
+
+      - name: Rename executable
+        if: ${{ github.ref == 'refs/heads/main'}}
+        working-directory: ${{github.workspace}}/dist
+        run: mv main.exe ${{ env.PACKAGE_NAME }}.exe
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ github.ref == 'refs/heads/main'}}
+        with:
+          name: ${{ env.PACKAGE_NAME }}
+          path: ${{ github.workspace }}/dist/${{ env.PACKAGE_NAME }}.exe
+          retention-days: 1
+          if-no-files-found: error
+
+  # Only release binaries if the workflow is running on main
+  release-binaries:
+    if: ${{ github.ref == 'refs/heads/main'}}
+    needs: build-binaries
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache Dasel
+        id: cache-dasel
+        uses: actions/cache@v3
+        with:
+          path: /usr/local/bin/dasel
+          key: ${{ runner.os }}-dasel
+
+      - name: Install dasel
+        if: steps.cache-dasel.outputs.cache-hit != 'true'
+        run: |
+          curl -sSLf "$(curl -sSLf https://api.github.com/repos/tomwright/dasel/releases/latest | grep browser_download_url | grep linux_amd64 | grep -v .gz | cut -d\" -f 4)" -L -o dasel && chmod +x dasel
+          mv ./dasel /usr/local/bin/dasel
+
+      - name: Extract package version
+        run: |
+          version=$(dasel select --plain -p toml -f pyproject.toml -s '.tool.poetry.version')
+          echo "cli_version=$version" >> $GITHUB_ENV
+
+      - uses: actions/download-artifact@v2
+        with:
+          path: artifacts/
+
+      - name: Push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@d745f2e74aaf1ee82e747b181f7a0967978abee0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ env.cli_version }}
+          tag_prefix: ""
+
+      - uses: ncipollo/release-action@58ae73b360456532aafd58ee170c045abbeaee37
+        with:
+          artifacts: "artifacts/*/*"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          artifactErrorsFailBuild: true
+          commit: ${{ github.sha }}
+          omitBody: true
+          name: ${{ env.PACKAGE_NAME }}
+          removeArtifacts: true
+          tag: ${{ steps.tag_version.outputs.new_tag }}

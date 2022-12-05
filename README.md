@@ -20,4 +20,4 @@ poetry install
 ```
 ## Usage
 
-[![asciicast](https://asciinema.org/a/542377.svg)](https://asciinema.org/a/542377)
+[![asciicast](https://asciinema.org/a/EkTmn6eVT25uLrZJzhMqGQzNa.svg)](https://asciinema.org/a/EkTmn6eVT25uLrZJzhMqGQzNa)

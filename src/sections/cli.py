@@ -1,3 +1,4 @@
+from os import makedirs
 from pathlib import Path
 
 from typer import Exit, Option, Typer
@@ -18,20 +19,40 @@ interface = Typer()
 @interface.command()
 def _main(
     data: Path = Option(
-        default=...,
+        ...,
+        "-d",
+        "--data",
         exists=True,
         readable=True,
         resolve_path=True,
         dir_okay=False,
+        help="DAT file with river section data.",
     ),
     river_names: Path = Option(
-        default=...,
+        ...,
+        "-r",
+        "--river-names",
         exists=True,
         readable=True,
         resolve_path=True,
         dir_okay=False,
+        help="INI file containing short river name mappings.",
+    ),
+    output_dir: Path = Option(
+        Path(".").resolve(strict=True),
+        "-o",
+        "--output-dir",
+        readable=True,
+        writable=True,
+        resolve_path=True,
+        file_okay=False,
+        dir_okay=True,
+        show_default=False,
+        help="Output directory for csv data. Defaults to current working directory.",
     ),
 ):
+    makedirs(output_dir, exist_ok=True)
+
     sections = read_and_process_sections(data)
     mapping = read_short_rivername_mapping(river_names)
     rivers = generate_rivers(sections)
@@ -45,12 +66,17 @@ def _main(
         )
     )
 
-    write_rivers_to_csv(mapping, rivers)
+    write_rivers_to_csv(mapping, rivers, output_dir)
 
 
-def write_rivers_to_csv(mapping: dict[int, str], rivers: dict[int, list[Section]]):
+def write_rivers_to_csv(
+    mapping: dict[int, str],
+    rivers: dict[int, list[Section]],
+    output_dir: Path,
+):
     for riv_number, river in rivers.items():
-        with uopen(f"{mapping[riv_number]}.csv", mode="w") as file:
+        file_path = output_dir / f"{mapping[riv_number]}.csv"
+        with uopen(file_path, mode="w") as file:
 
             file.write(
                 "REF,SECTION NUMBER,NAME,DATE,CHAINAGE,OFFSET/BRG,LEVEL,EASTING,NORTHING,BANK,MANNINGS,GROUND,VEGETATION\n"

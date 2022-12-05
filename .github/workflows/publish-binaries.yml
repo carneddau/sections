@@ -79,7 +79,7 @@ jobs:
 
       - name: Extract package version
         run: |
-          version=$(dasel select --plain -p toml -f pyproject.toml -s '.tool.poetry.version')
+          version=$(dasel -r toml -f pyproject.toml -s '.tool.poetry.version')
           echo "cli_version=$version" >> $GITHUB_ENV
 
       - uses: actions/download-artifact@v2

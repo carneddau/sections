@@ -20,5 +20,8 @@ jobs:
           python-version: "3.10"
           cache: "poetry"
 
+      - name: Install root project
+        run: poetry install --no-interaction
+
       - name: Lint
         run: poetry run task lint

@@ -94,7 +94,7 @@ jobs:
           custom_tag: ${{ env.cli_version }}
           tag_prefix: ""
 
-      - uses: ncipollo/release-action@58ae73b360456532aafd58ee170c045abbeaee37
+      - uses: ncipollo/release-action@a2e71bdd4e7dab70ca26a852f29600c98b33153e
         with:
           artifacts: "artifacts/*/*"
           token: ${{ secrets.GITHUB_TOKEN }}

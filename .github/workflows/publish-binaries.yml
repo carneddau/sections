@@ -82,7 +82,7 @@ jobs:
           version=$(dasel -r toml -f pyproject.toml -s '.tool.poetry.version')
           echo "cli_version=$version" >> $GITHUB_ENV
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           path: artifacts/
 

@@ -25,7 +25,7 @@ pylint = "^2.15.7"
 mypy = "^0.991"
 black = "^22.10.0"
 flake8 = "^6.0.0"
-isort = "^5.10.1"
+isort = "^5.11.4"
 taskipy = "^1.10.3"
 pyinstaller = "^5.7.0"
 

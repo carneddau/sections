@@ -16,7 +16,7 @@ sections = "sections.__main__:main"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
-pydantic = {extras = ["dotenv"], version = "^1.10.2"}
+pydantic = {extras = ["dotenv"], version = "^1.10.5"}
 typer = {extras = ["all"], version = "^0.7.0"}
 
 [tool.poetry.group.dev.dependencies]

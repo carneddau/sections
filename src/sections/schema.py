@@ -42,6 +42,10 @@ _SURFACE_MANNINGS = {
 }
 
 _VEGETATION_MANNINGS = {
+    "FM": BedManning(name="+Masonry_Flood Defence_Embankment", manning=0.04),
+    "BW": BedManning(name="+Brick Wall_Flood Defence_Wall", manning=0.015),
+    "CW": BedManning(name="+Concrete Wall_Flood Defence", manning=0.015),
+    "FG": BedManning(name="+Grass_Flood Defence_Embankment", manning=0.07),
     "FF": BedManning(name="free floating plants", manning=0.07),
     "GS": BedManning(name="Grass", manning=0.07),
     "MO": BedManning(name="moss", manning=0.07),

@@ -38,12 +38,14 @@ def process_raw_sections(sections: list[list[str]]) -> list[SectionRaw]:
 
         cross_sections: list[list[str]] = []
         metadata: dict[str, list[Optional[str]]] = {}
-        for row in reader(section_in):
+        for index, row in enumerate(iterable=reader(section_in), start=1):
 
             len_row = len(row)
 
             if len_row != 6:
-                raise ValueError(f"Expected 6 elements for each row, got {len_row}")
+                raise ValueError(
+                    f"Expected 6 elements for each row, got {len_row} at line {index}"
+                )
 
             row_nones = [_string_or_none(x) for x in row]
 
@@ -123,7 +125,12 @@ def read_short_rivername_mapping(file_name: PathLike) -> dict[int, str]:
 
 def read_and_process_sections(data: PathLike, mannings: Mannings) -> list[Section]:
     sections = read_sections(data)
-    raw_sections = process_raw_sections(sections)
+    try:
+        raw_sections = process_raw_sections(sections)
+    except ValueError as err:
+        err_console.print(f"Could not parse '{data}' because: {err}")
+        raise err
+
     return process_sections(raw_sections, mannings)
 
 

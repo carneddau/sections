@@ -34,7 +34,10 @@ def process_raw_sections(sections: list[list[str]]) -> list[SectionRaw]:
     """Strip whitespace"""
     processed_sections: list[SectionRaw] = []
 
-    for section_in in sections:
+    for sec_index, section_in in enumerate(
+        iterable=sections,
+        start=1,
+    ):
 
         cross_sections: list[list[str]] = []
         metadata: dict[str, list[Optional[str]]] = {}
@@ -44,7 +47,7 @@ def process_raw_sections(sections: list[list[str]]) -> list[SectionRaw]:
 
             if len_row != 6:
                 raise ValueError(
-                    f"Expected 6 elements for each row, got {len_row} at line {index}"
+                    f"Expected 6 elements for each row, got {len_row} for section {sec_index}, line {index}"
                 )
 
             row_nones = [_string_or_none(x) for x in row]

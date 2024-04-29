@@ -1,5 +1,6 @@
 input/
 data/
+output/
 
 # cookiecutter template initiation script https://github.com/rlkennedyreid/cookiecutter-python-project
 initiate-project.sh

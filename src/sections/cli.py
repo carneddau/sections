@@ -53,7 +53,11 @@ def _main(
 ):
     makedirs(output_dir, exist_ok=True)
 
-    sections = read_and_process_sections(data)
+    try:
+        sections = read_and_process_sections(data)
+    except ValueError as err:
+        err_console.print(f"Parsing sections in '{data.name}' failed")
+        raise Exit(1) from err
     mapping = read_short_rivername_mapping(river_names)
     rivers = generate_rivers(sections)
 
@@ -95,8 +99,4 @@ def main():
     to spam the log output.
     """
     create_basic_logger(package(), get_settings().log_level)
-    try:
-        interface()
-    except Exception as err:
-        err_console.print(err)
-        Exit(1)
+    interface()

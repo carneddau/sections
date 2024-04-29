@@ -3,7 +3,7 @@ from os import PathLike
 from typing import Optional
 
 from .schema import Section, SectionRaw
-from .utils import uopen
+from .utils import uopen, err_console
 
 
 def read_sections(file_name: PathLike) -> list[list[str]]:
@@ -80,7 +80,13 @@ def process_sections(sections_raw: list[SectionRaw]) -> list[Section]:
     sections: list[Section] = []
 
     for section_raw in sections_raw:
-        sections.append(Section.from_raw(section_raw))
+        try:
+            sections.append(Section.from_raw(section_raw))
+        except ValueError as err:
+            msg = f"Couldn't parse the following section because: {err}"
+            err_console.print(msg)
+            err_console.print_json(data=section_raw.metadata)
+            raise ValueError("Parsing section failed") from err
 
     return sections
 

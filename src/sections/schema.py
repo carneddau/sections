@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from pydantic import BaseModel
-
+from .utils import err_console
 
 @dataclass
 class BedManning:
@@ -115,7 +115,7 @@ class CrossSection(BaseModel):
         # If we're on a bank point, remove that last character so we have a valid float
         level_str = level_code[:-1] if (left or right) else level_code
 
-        return cls(
+        cross_section = cls(
             offset=offset,
             level=float(level_str),
             feature_code=cross_raw[2],
@@ -124,6 +124,12 @@ class CrossSection(BaseModel):
             left=left,
             right=right,
         )
+
+        if cross_section.vegetation and VEGETATION_MANNINGS.get(cross_section.vegetation) is None:
+            raise ValueError(f"Did not understand feature code '{cross_section.vegetation}' for vegation manning.")
+        if cross_section.surface and SURFACE_MANNINGS.get(cross_section.surface) is None:
+            raise ValueError(f"Did not understand feature code '{cross_section.surface}' for surface manning.")
+        return cross_section
 
 
 class Section(BaseModel):

@@ -2,8 +2,8 @@ from csv import reader
 from os import PathLike
 from typing import Optional
 
-from .schema import Section, SectionRaw
-from .utils import uopen, err_console
+from .schema import DEFAULT_MANNINGS, Mannings, Section, SectionRaw
+from .utils import err_console, uopen
 
 
 def read_sections(file_name: PathLike) -> list[list[str]]:
@@ -76,12 +76,15 @@ def process_raw_sections(sections: list[list[str]]) -> list[SectionRaw]:
     return processed_sections
 
 
-def process_sections(sections_raw: list[SectionRaw]) -> list[Section]:
+def process_sections(
+    sections_raw: list[SectionRaw],
+    mannings: Mannings,
+) -> list[Section]:
     sections: list[Section] = []
 
     for section_raw in sections_raw:
         try:
-            sections.append(Section.from_raw(section_raw))
+            sections.append(Section.from_raw(section_raw, mannings))
         except ValueError as err:
             msg = f"Couldn't parse the following section because: {err}"
             err_console.print(msg)
@@ -118,10 +121,32 @@ def read_short_rivername_mapping(file_name: PathLike) -> dict[int, str]:
     return mapping
 
 
-def read_and_process_sections(data: PathLike) -> list[Section]:
+def read_and_process_sections(data: PathLike, mannings: Mannings) -> list[Section]:
     sections = read_sections(data)
     raw_sections = process_raw_sections(sections)
-    return process_sections(raw_sections)
+    return process_sections(raw_sections, mannings)
+
+
+def read_and_process_mannings(mannings_file: Optional[PathLike] = None) -> Mannings:
+    mannings = DEFAULT_MANNINGS
+
+    if mannings_file is not None:
+
+        with open(mannings_file, mode="rb") as file:
+            json_data = file.read()
+            try:
+                overrides = Mannings.model_validate_json(
+                    json_data,
+                    strict=True,
+                )
+
+            except ValueError as err:
+                raise err
+
+        mannings.surface |= overrides.surface  # pylint: disable=no-member
+        mannings.vegetation |= overrides.vegetation  # pylint: disable=no-member
+
+    return mannings
 
 
 def generate_rivers(sections: list[Section]):

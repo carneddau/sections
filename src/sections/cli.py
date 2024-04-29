@@ -1,14 +1,16 @@
 from os import makedirs
 from pathlib import Path
+from typing import Optional
 
 from typer import Exit, Option, Typer
 
 from .input import (
     generate_rivers,
+    read_and_process_mannings,
     read_and_process_sections,
     read_short_rivername_mapping,
 )
-from .schema import Section
+from .schema import Mannings, Section
 from .settings import get_settings
 from .utils import console, create_basic_logger, err_console, package, uopen
 
@@ -38,6 +40,16 @@ def _main(
         dir_okay=False,
         help="INI file containing short river name mappings.",
     ),
+    mannings_file: Optional[Path] = Option(
+        None,
+        "-m",
+        "--mannings",
+        exists=True,
+        readable=True,
+        resolve_path=True,
+        dir_okay=False,
+        help="JSON file containing mannings definitions.",
+    ),
     output_dir: Path = Option(
         Path(".").resolve(strict=True),
         "-o",
@@ -54,7 +66,14 @@ def _main(
     makedirs(output_dir, exist_ok=True)
 
     try:
-        sections = read_and_process_sections(data)
+        mannings = read_and_process_mannings(mannings_file)
+    except ValueError as err:
+        name = mannings_file.name if mannings_file else ""
+        err_console.print(f"Could not parse mannings file '{name}' because: {err}")
+        raise Exit(1) from err
+
+    try:
+        sections = read_and_process_sections(data, mannings)
     except ValueError as err:
         err_console.print(f"Parsing sections in '{data.name}' failed")
         raise Exit(1) from err
@@ -70,13 +89,14 @@ def _main(
         )
     )
 
-    write_rivers_to_csv(mapping, rivers, output_dir)
+    write_rivers_to_csv(mapping, rivers, output_dir, mannings)
 
 
 def write_rivers_to_csv(
     mapping: dict[int, str],
     rivers: dict[int, list[Section]],
     output_dir: Path,
+    mannings: Mannings,
 ):
     for riv_number, river in rivers.items():
         file_path = output_dir / f"{mapping[riv_number]}.csv"
@@ -87,7 +107,7 @@ def write_rivers_to_csv(
             )
 
             for section in river:
-                for record in section.csv_records(mapping):
+                for record in section.csv_records(mapping, mannings):
                     file.write(f"{record}\n")
 
 

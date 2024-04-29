@@ -1,3 +1,6 @@
+*.json
+!mannings_example.json
+
 input/
 data/
 output/

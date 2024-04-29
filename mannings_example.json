@@ -1,0 +1,158 @@
+{
+    "surface": {
+        "AS": {
+            "name": "tarmacadam",
+            "manning": 0.016
+        },
+        "BK": {
+            "name": "brick",
+            "manning": 0.015
+        },
+        "BR": {
+            "name": "bedrock",
+            "manning": 0.03
+        },
+        "CC": {
+            "name": "concrete",
+            "manning": 0.015
+        },
+        "CM": {
+            "name": "corrugated metal",
+            "manning": 0.05
+        },
+        "CO": {
+            "name": "cobble",
+            "manning": 0.04
+        },
+        "GA": {
+            "name": "gabions",
+            "manning": 0.03
+        },
+        "GR": {
+            "name": "gravel",
+            "manning": 0.035
+        },
+        "ME": {
+            "name": "metal",
+            "manning": 0.04
+        },
+        "MA": {
+            "name": "masonry",
+            "manning": 0.04
+        },
+        "OT": {
+            "name": "other",
+            "manning": 0.03
+        },
+        "PL": {
+            "name": "plastic",
+            "manning": 0.015
+        },
+        "PP": {
+            "name": "plastic pile",
+            "manning": 0.03
+        },
+        "RA": {
+            "name": "rock armour",
+            "manning": 0.03
+        },
+        "RR": {
+            "name": "rip-rap",
+            "manning": 0.03
+        },
+        "RU": {
+            "name": "rubble",
+            "manning": 0.05
+        },
+        "SO": {
+            "name": "soil",
+            "manning": 0.03
+        },
+        "SP": {
+            "name": "sheet pile",
+            "manning": 0.03
+        },
+        "ST": {
+            "name": "stone",
+            "manning": 0.025
+        },
+        "TA": {
+            "name": "Tarmacadam",
+            "manning": 0.016
+        },
+        "TI": {
+            "name": "timber",
+            "manning": 0.02
+        },
+        "WO": {
+            "name": "wood",
+            "manning": 0.05
+        },
+        "WP": {
+            "name": "wood pile",
+            "manning": 0.03
+        }
+    },
+    "vegetation": {
+        "FF": {
+            "name": "free floating plants",
+            "manning": 0.07
+        },
+        "GS": {
+            "name": "Grass",
+            "manning": 0.07
+        },
+        "MO": {
+            "name": "moss",
+            "manning": 0.07
+        },
+        "RE": {
+            "name": "Reeds",
+            "manning": 0.1
+        },
+        "MP": {
+            "name": "submerged plants",
+            "manning": 0.1
+        },
+        "TR": {
+            "name": "Trailing plants",
+            "manning": 0.1
+        },
+        "GL": {
+            "name": "Grass",
+            "manning": 0.05
+        },
+        "GM": {
+            "name": "Grass",
+            "manning": 0.035
+        },
+        "HC": {
+            "name": "closed hedge",
+            "manning": 0.07
+        },
+        "HO": {
+            "name": "open hedge",
+            "manning": 0.05
+        },
+        "TD": {
+            "name": "Dense Trees",
+            "manning": 0.1
+        },
+        "TH": {
+            "name": "Heavy Trees",
+            "manning": 0.1
+        },
+        "TL": {
+            "name": "Light Trees",
+            "manning": 0.05
+        },
+        "TM": {
+            "name": "Medium Trees",
+            "manning": 0.07
+        },
+        "NO": {
+            "name": "",
+            "manning": 0.0
+        }
+    }
+}

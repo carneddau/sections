@@ -1,59 +1,69 @@
-from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from pydantic import BaseModel
-from .utils import err_console
+from pydantic import BaseModel, ConfigDict
+from pydantic.dataclasses import dataclass
 
-@dataclass
-class BedManning:
+
+class BedManning(BaseModel):
     name: str
     manning: float
+    model_config = ConfigDict(extra="forbid")
 
 
-SURFACE_MANNINGS = {
-    "AS": BedManning("tarmacadam", 0.016),
-    "BK": BedManning("brick", 0.015),
-    "BR": BedManning("bedrock", 0.03),
-    "CC": BedManning("concrete", 0.015),
-    "CM": BedManning("corrugated metal", 0.05),
-    "CO": BedManning("cobble", 0.04),
-    "GA": BedManning("gabions", 0.03),
-    "GR": BedManning("gravel", 0.035),
-    "ME": BedManning("metal", 0.04),
-    "MA": BedManning("masonry", 0.04),
-    "OT": BedManning("other", 0.03),
-    "PL": BedManning("plastic", 0.015),
-    "PP": BedManning("plastic pile", 0.03),
-    "RA": BedManning("rock armour", 0.03),
-    "RR": BedManning("rip-rap", 0.03),
-    "RU": BedManning("rubble", 0.05),
-    "SO": BedManning("soil", 0.03),
-    "SP": BedManning("sheet pile", 0.03),
-    "ST": BedManning("stone", 0.025),
-    "TA": BedManning("Tarmacadam", 0.016),
-    "TI": BedManning("timber", 0.02),
-    "WO": BedManning("wood", 0.05),
-    "WP": BedManning("wood pile", 0.03),
+class Mannings(BaseModel):
+    surface: dict[str, BedManning]
+    vegetation: dict[str, BedManning]
+    model_config = ConfigDict(extra="forbid")
+
+
+_SURFACE_MANNINGS = {
+    "AS": BedManning(name="tarmacadam", manning=0.016),
+    "BK": BedManning(name="brick", manning=0.015),
+    "BR": BedManning(name="bedrock", manning=0.03),
+    "CC": BedManning(name="concrete", manning=0.015),
+    "CM": BedManning(name="corrugated metal", manning=0.05),
+    "CO": BedManning(name="cobble", manning=0.04),
+    "GA": BedManning(name="gabions", manning=0.03),
+    "GR": BedManning(name="gravel", manning=0.035),
+    "ME": BedManning(name="metal", manning=0.04),
+    "MA": BedManning(name="masonry", manning=0.04),
+    "OT": BedManning(name="other", manning=0.03),
+    "PL": BedManning(name="plastic", manning=0.015),
+    "PP": BedManning(name="plastic pile", manning=0.03),
+    "RA": BedManning(name="rock armour", manning=0.03),
+    "RR": BedManning(name="rip-rap", manning=0.03),
+    "RU": BedManning(name="rubble", manning=0.05),
+    "SO": BedManning(name="soil", manning=0.03),
+    "SP": BedManning(name="sheet pile", manning=0.03),
+    "ST": BedManning(name="stone", manning=0.025),
+    "TA": BedManning(name="Tarmacadam", manning=0.016),
+    "TI": BedManning(name="timber", manning=0.02),
+    "WO": BedManning(name="wood", manning=0.05),
+    "WP": BedManning(name="wood pile", manning=0.03),
 }
 
-VEGETATION_MANNINGS = {
-    "FF": BedManning("free floating plants", 0.07),
-    "GS": BedManning("Grass", 0.07),
-    "MO": BedManning("moss", 0.07),
-    "RE": BedManning("Reeds", 0.1),
-    "MP": BedManning("submerged plants", 0.1),
-    "TR": BedManning("Trailing plants", 0.1),
-    "GL": BedManning("Grass", 0.05),
-    "GM": BedManning("Grass", 0.035),
-    "HC": BedManning("closed hedge", 0.07),
-    "HO": BedManning("open hedge", 0.05),
-    "TD": BedManning("Dense Trees", 0.1),
-    "TH": BedManning("Heavy Trees", 0.1),
-    "TL": BedManning("Light Trees", 0.05),
-    "TM": BedManning("Medium Trees", 0.07),
-    "NO": BedManning("", 0.0)
-    # "GS": BedManning("Grass", 0.04), # vegetation types-banks & flood plain
+_VEGETATION_MANNINGS = {
+    "FF": BedManning(name="free floating plants", manning=0.07),
+    "GS": BedManning(name="Grass", manning=0.07),
+    "MO": BedManning(name="moss", manning=0.07),
+    "RE": BedManning(name="Reeds", manning=0.1),
+    "MP": BedManning(name="submerged plants", manning=0.1),
+    "TR": BedManning(name="Trailing plants", manning=0.1),
+    "GL": BedManning(name="Grass", manning=0.05),
+    "GM": BedManning(name="Grass", manning=0.035),
+    "HC": BedManning(name="closed hedge", manning=0.07),
+    "HO": BedManning(name="open hedge", manning=0.05),
+    "TD": BedManning(name="Dense Trees", manning=0.1),
+    "TH": BedManning(name="Heavy Trees", manning=0.1),
+    "TL": BedManning(name="Light Trees", manning=0.05),
+    "TM": BedManning(name="Medium Trees", manning=0.07),
+    "NO": BedManning(name="", manning=0.0),
 }
+
+DEFAULT_MANNINGS = Mannings(
+    surface=_SURFACE_MANNINGS,
+    vegetation=_VEGETATION_MANNINGS,
+)
 
 
 @dataclass
@@ -96,7 +106,7 @@ class CrossSection(BaseModel):
         )
 
     @classmethod
-    def from_raw(cls, cross_raw: list[str]):
+    def from_raw(cls, cross_raw: list[str], mannings: Mannings):
 
         if len(cross_raw) != 5:
             raise ValueError(f"input array must be length 5, got {len(cross_raw)}")
@@ -125,10 +135,20 @@ class CrossSection(BaseModel):
             right=right,
         )
 
-        if cross_section.vegetation and VEGETATION_MANNINGS.get(cross_section.vegetation) is None:
-            raise ValueError(f"Did not understand feature code '{cross_section.vegetation}' for vegation manning.")
-        if cross_section.surface and SURFACE_MANNINGS.get(cross_section.surface) is None:
-            raise ValueError(f"Did not understand feature code '{cross_section.surface}' for surface manning.")
+        if (
+            cross_section.vegetation
+            and mannings.vegetation.get(cross_section.vegetation) is None
+        ):
+            raise ValueError(
+                f"Did not understand feature code '{cross_section.vegetation}' for vegation manning."
+            )
+        if (
+            cross_section.surface
+            and mannings.surface.get(cross_section.surface) is None
+        ):
+            raise ValueError(
+                f"Did not understand feature code '{cross_section.surface}' for surface manning."
+            )
         return cross_section
 
 
@@ -150,8 +170,10 @@ class Section(BaseModel):
     ground: str
 
     @classmethod
-    def from_raw(cls, section_raw: SectionRaw):
-        cross_sections = [CrossSection.from_raw(x) for x in section_raw.cross_sections]
+    def from_raw(cls, section_raw: SectionRaw, mannings: Mannings):
+        cross_sections = [
+            CrossSection.from_raw(x, mannings) for x in section_raw.cross_sections
+        ]
         date = section_raw.metadata["SECDATE"][0]
         offset = section_raw.metadata["SECBEARING"][0]
         newsec = section_raw.metadata["NEWSEC"]
@@ -213,7 +235,10 @@ class Section(BaseModel):
         )
 
     def __cross_section_record(
-        self, riv_name_map: dict[int, str], cross_section: CrossSection
+        self,
+        riv_name_map: dict[int, str],
+        cross_section: CrossSection,
+        mannings: Mannings,
     ) -> str:
 
         bank: str
@@ -232,9 +257,9 @@ class Section(BaseModel):
             and cross_section.surface is not None
         ):
             manning = (
-                VEGETATION_MANNINGS[cross_section.vegetation].manning
+                mannings.vegetation[cross_section.vegetation].manning
                 if is_vegetation
-                else SURFACE_MANNINGS[cross_section.surface].manning
+                else mannings.surface[cross_section.surface].manning
             )
 
         return ",".join(
@@ -250,20 +275,34 @@ class Section(BaseModel):
                 f"{cross_section.northing}",
                 bank,
                 f"{manning}" if manning else "",
-                SURFACE_MANNINGS[cross_section.surface].name
-                if cross_section.surface
-                else "",
-                VEGETATION_MANNINGS[cross_section.vegetation].name
-                if cross_section.vegetation
-                else "",
+                (
+                    mannings.surface[cross_section.surface].name
+                    if cross_section.surface
+                    else ""
+                ),
+                (
+                    mannings.vegetation[cross_section.vegetation].name
+                    if cross_section.vegetation
+                    else ""
+                ),
             ]
         )
 
-    def csv_records(self, riv_name_map: dict[int, str]) -> list[str]:
+    def csv_records(
+        self,
+        riv_name_map: dict[int, str],
+        mannings: Mannings,
+    ) -> list[str]:
         records: list[str] = []
         records.append(self.__first_record(riv_name_map))
 
         for cross_section in self.cross_sections:
-            records.append(self.__cross_section_record(riv_name_map, cross_section))
+            records.append(
+                self.__cross_section_record(
+                    riv_name_map,
+                    cross_section,
+                    mannings,
+                )
+            )
 
         return records

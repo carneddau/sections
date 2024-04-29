@@ -3,7 +3,7 @@ name = "sections"
 
 # See: https://github.com/python-poetry/poetry/pull/2366#issuecomment-652418094
 # For info on poetry versioning for Python < 3.8
-version = "0.1.0"
+version = "1.0.0"
 
 description = "Tool to convert river section data to a more usable format"
 authors = ["Robin Kennedy-Reid <rlkennedyreid@carneddau.cymru>"]

@@ -1,7 +1,6 @@
 from typing import Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict
-from pydantic.dataclasses import dataclass
 
 
 class BedManning(BaseModel):
@@ -66,8 +65,7 @@ DEFAULT_MANNINGS = Mannings(
 )
 
 
-@dataclass
-class SectionRaw:
+class SectionRaw(BaseModel):
     metadata: dict[str, list[Optional[str]]]
     cross_sections: list[list[str]]
 

@@ -72,7 +72,10 @@ def process_raw_sections(sections: list[list[str]]) -> list[SectionRaw]:
                         raise ValueError(f"metadata key already exists {identifier}")
                     metadata[identifier] = row_nones[1:]
 
-        section = SectionRaw(metadata, cross_sections)
+        section = SectionRaw(
+            metadata=metadata,
+            cross_sections=cross_sections,
+        )
         processed_sections.append(section)
 
     return processed_sections
